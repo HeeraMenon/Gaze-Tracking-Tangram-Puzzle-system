@@ -1,0 +1,294 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+
+WorldInfo {
+  info [
+    ""
+    ""
+    ""
+  ]
+  basicTimeStep 16
+}
+Viewpoint {
+  orientation 0.3648413292466565 -0.5160528194864559 -0.7749711555752329 4.804077352719283
+  position -0.9929703812448101 -2.769186570379168 2.7258439637908705
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Solid {
+  translation 0 -5.02468e-09 0.409313
+  rotation -0.05555304556975655 -0.0555524138092586 -0.9969091174464647 6.719164093958748e-09
+  children [
+    Shape {
+      appearance PBRAppearance {
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF GEOMETRY_TABLETOP Box {
+        size 2 2 0.02
+      }
+    }
+  ]
+  name "tableTop"
+  boundingObject USE GEOMETRY_TABLETOP
+  physics Physics {
+    mass 5
+  }
+}
+Floor {
+}
+Solid {
+  translation 1 1 0.199559
+  rotation 2.0788760842909715e-08 -5.686339048536837e-06 0.9999999999838327 1.570817235218413
+  children [
+    Shape {
+      appearance PBRAppearance {
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF GEOMETRY_LEG Box {
+        size 0.05 0.05 0.4
+      }
+    }
+  ]
+  name "TableLeg1"
+  boundingObject USE GEOMETRY_LEG
+  physics Physics {
+  }
+}
+Solid {
+  translation 1 -1 0.1995585500985331
+  rotation -0.7060831984224146 -0.7081288654018939 -0.00016398231396113348 8.023993548568075e-06
+  children [
+    Shape {
+      geometry USE GEOMETRY_LEG
+    }
+  ]
+  name "TableLeg2"
+  boundingObject USE GEOMETRY_LEG
+  physics Physics {
+  }
+}
+Solid {
+  translation -1 -1 0.1995585500739561
+  rotation -0.7065625870929427 0.7076505362537225 -0.00017047095449611183 8.041784137371574e-06
+  children [
+    Shape {
+      geometry USE GEOMETRY_LEG
+    }
+  ]
+  name "TableLeg3"
+  boundingObject USE GEOMETRY_LEG
+  physics Physics {
+  }
+}
+Solid {
+  translation -1 1 0.1995585500493763
+  rotation 0.7060877151452223 0.7081243618657607 -0.00016325810402618678 8.05958662167746e-06
+  children [
+    Shape {
+      geometry USE GEOMETRY_LEG
+    }
+  ]
+  name "TableLeg4"
+  boundingObject USE GEOMETRY_LEG
+  physics Physics {
+  }
+}
+Solid {
+  translation 0.2 0 0.425
+  rotation 0 0.7071067811865475 0.7071067811865475 0
+  children [
+    DEF GEOMETRY_ISCOCOLATE_TIANGLE_PIECE Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.4
+        metalness 0
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            0 -0.1 0
+            0.1 0 0
+            0 0.1 0
+            0 -0.1 0.02
+            0.1 0 0.02
+            0 0.1 0.02
+          ]
+        }
+        coordIndex [
+          0, 2, 1, -1, 3, 4, 5, -1, 0, 1
+          4, 3, -1, 1, 2, 5, 4, -1, 2, 0
+          3, 5, -1
+        ]
+      }
+    }
+  ]
+  name "TangramPieceIsoscelesTriangle"
+  boundingObject USE GEOMETRY_ISCOCOLATE_TIANGLE_PIECE
+  physics Physics {
+    density 300
+  }
+}
+Solid {
+  translation 0 -0.1 0.425
+  rotation 0 0.7071067811865475 0.7071067811865475 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 1 0
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF GEOMETRY_RIGHT_TRIANGLE IndexedFaceSet {
+        coord Coordinate {
+          point [
+            0 0.2 0
+            0.2 0 0
+            0.2 0.2 0
+            0 0.2 0.02
+            0.2 0 0.02
+            0.2 0.2 0.02
+          ]
+        }
+        coordIndex [
+          0, 2, 1, -1, 3, 4, 5, -1, 0, 1
+          4, 3, -1, 1, 2, 5, 4, -1, 2, 0
+          3, 5, -1
+        ]
+      }
+    }
+  ]
+  name "TangramPieceTriangle(1)"
+  boundingObject USE GEOMETRY_RIGHT_TRIANGLE
+  physics Physics {
+    density 300
+  }
+}
+Solid {
+  translation 0.2 0.1 0.425
+  rotation 0 0 1 -3.1331853071795863
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 0.4
+        metalness 0
+      }
+      geometry USE GEOMETRY_RIGHT_TRIANGLE
+    }
+  ]
+  name "TangramPieceTriangle(2)"
+  boundingObject USE GEOMETRY_RIGHT_TRIANGLE
+  physics Physics {
+    density 300
+  }
+}
+Solid {
+  translation 0 0.075 0.425
+  rotation 0 0 1 -3.1331853071795863
+  children [
+    DEF GEOMETRY_SQUARE_PIECE Shape {
+      appearance PBRAppearance {
+        baseColor 0 1 1
+        roughness 0.4
+        metalness 0
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            0 0 0
+            0.15 0 0
+            0.15 0.15 0
+            0 0.15 0
+            0 0 0.02
+            0.15 0 0.02
+            0.15 0.15 0.02
+            0 0.15 0.02
+          ]
+        }
+        coordIndex [
+          0, 1, 2, 3, -1, 4, 5, 6, 7, -1, 0, 1, 5, 4, -1, 1, 2, 6, 5, -1, 2, 3, 7, 6, -1, 3, 0, 4, 7, -1
+        ]
+      }
+    }
+  ]
+  name "TangramPieceSquare"
+  boundingObject USE GEOMETRY_SQUARE_PIECE
+  physics Physics {
+    density 300
+  }
+}
+Solid {
+  translation 0 0.075 0.425
+  children [
+    DEF GEOMETRY_PARALLELOGRAM_UP Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 1
+        roughness 0.4
+        metalness 0
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            -0.15 0 0
+            0 0 0
+            -0.15 0.075 0
+            -0.3 0.075 0
+            -0.15 0 0.02
+            0 0 0.02
+            -0.15 0.075 0.02
+            -0.3 0.075 0.02
+          ]
+        }
+        coordIndex [
+          0, 1, 2, 3, -1, 4, 5, 6, 7, -1, 0, 1, 5, 4, -1, 1, 2, 6, 5, -1, 2, 3, 7, 6, -1, 3, 0, 4, 7, -1
+        ]
+      }
+    }
+  ]
+  name "TangramPieceParallelogram"
+  boundingObject USE GEOMETRY_PARALLELOGRAM_UP
+  physics Physics {
+    density 300
+  }
+}
+Solid {
+  translation 0 -0.075 0.425
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 1 0
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF GEOMETRY_PARALELLOGRAM_DOWN IndexedFaceSet {
+        coord Coordinate {
+          point [
+            -0.3 -0.075 0
+            -0.15 -0.075 0
+            0 0 0
+            -0.15 0 0
+            -0.3 -0.075 0.02
+            -0.15 -0.075 0.02
+            0 0 0.02
+            -0.15 0 0.02
+          ]
+        }
+        coordIndex [
+          0, 1, 2, 3, -1, 4, 5, 6, 7, -1, 0, 1, 5, 4, -1, 1, 2, 6, 5, -1, 2, 3, 7, 6, -1, 3, 0, 4, 7, -1
+        ]
+      }
+    }
+  ]
+  name "TangramPieceParallelogram2"
+  boundingObject USE GEOMETRY_PARALELLOGRAM_DOWN
+  physics Physics {
+    density 300
+  }
+}
