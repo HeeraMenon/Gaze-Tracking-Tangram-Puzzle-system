@@ -4,6 +4,11 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "../protos/TangramPieces.proto"
+EXTERNPROTO "../protos/TangramIsoPiece.proto"
+EXTERNPROTO "../protos/TangramPara2Piece.proto"
+EXTERNPROTO "../protos/TangramPara1Piece.proto"
+EXTERNPROTO "../protos/TangramRightPiece.proto"
+EXTERNPROTO "../protos/TangramSquarePiece.proto"
 
 WorldInfo {
   info [
@@ -14,15 +19,15 @@ WorldInfo {
   basicTimeStep 16
 }
 Viewpoint {
-  orientation -0.5112674234696705 0.5268406948456902 0.6790025802257271 1.9205690213186435
-  position 0.0025896320985214216 -0.7105134462253865 4.149631397858005
+  orientation -0.3679206990831542 0.3867938815698481 0.8455914216489507 1.6882276994735133
+  position -0.05423684139758617 -2.2811010156415152 3.331348089157811
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
 Solid {
-  translation 0.0877343 0.00123906 0.409313
+  translation 0 0 0.409313
   rotation -0.05555304556975655 -0.0555524138092586 -0.9969091174464647 6.719164093958748e-09
   children [
     Shape {
@@ -204,11 +209,9 @@ Solid {
   ]
   name "Puzzle outline"
 }
-
 Solid {
   translation 0 0 0.43
   children [
-    # First line
     DEF MARK_LINE Shape {
       appearance PBRAppearance {
         baseColor 1 0 1
@@ -219,15 +222,36 @@ Solid {
         size 0.04 2 0.005
       }
     }
-
-    # Reused line, rotated 90 degrees around Z
     Transform {
-    rotation 0 0 1 1.5708
-    scale 1 0.5 1
-    children [
-      USE MARK_LINE
-    ]
-  }
+      translation 0.5 0 0
+      rotation 0 0 1 1.5708
+      scale 1 0.5 1
+      children [
+        USE MARK_LINE
+      ]
+    }
   ]
   name "Table markings"
+}
+TangramIsoPiece {
+}
+TangramPara2Piece {
+  name "Para2(1)"
+  translation 0 0 0.43
+}
+TangramPara1Piece {
+  name "Para1(1)"
+  translation 0 0 0.43
+}
+TangramRightPiece {
+  name "Right(1)"
+  translation 0 0 0.43
+}
+TangramRightPiece {
+  name "Right(2)"
+  translation 0 0 0.43
+}
+TangramSquarePiece {
+  name "Square(1)"
+  translation 0 0 0.43
 }

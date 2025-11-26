@@ -1,5 +1,12 @@
 #VRML_SIM R2025a utf8
 
+
+EXTERNPROTO "TangramIsoPiece.proto"
+EXTERNPROTO "TangramRightPiece.proto"
+EXTERNPROTO "TangramSquarePiece.proto"
+EXTERNPROTO "TangramPara1Piece.proto"
+EXTERNPROTO "TangramPara2Piece.proto"
+
 PROTO TangramPieces [
   field SFVec3f origin 0 0 0
 ] {
@@ -7,297 +14,72 @@ PROTO TangramPieces [
     translation IS origin
     children [
 
-      # ===============================
-      # Isosceles Triangle  (Iso)
-      # original: translation 0.2 0 0.425
-      # nudged slightly in +x to open tiny gaps
-      # ===============================
+      # Isosceles Triangle (Iso)
       Transform {
         translation 0.22 0 0.43
+        rotation 0 0.7071067811865475 0.7071067811865475 0
         children [
-          Solid {
-            name "Iso"
-            rotation 0 0.7071067811865475 0.7071067811865475 0
-            children [
-              DEF GEOMETRY_ISO Shape {
-                appearance PBRAppearance {
-                  baseColor 1 0 0
-                  roughness 0.4
-                  metalness 0
-                }
-                geometry IndexedFaceSet {
-                  coord Coordinate {
-                    point [
-                      0   -0.1  0
-                      0.1  0    0
-                      0    0.1  0
-                      0   -0.1  0.02
-                      0.1  0    0.02
-                      0    0.1  0.02
-                    ]
-                  }
-                  coordIndex [
-                    0 2 1 -1
-                    3 4 5 -1
-                    0 1 4 3 -1
-                    1 2 5 4 -1
-                    2 0 3 5 -1
-                  ]
-                }
-              }
-            ]
-            # Box entirely inside the triangle
-            boundingObject Transform {
-              translation 0.04 0 0
-              children [
-                Box { size 0.06 0.06 0.02 }
-              ]
-            }
-            physics Physics { density 300 }
+          TangramIsoPiece {
+            color 1 0 0
+            name "IsoPiece"
           }
         ]
       }
 
-      # ===============================
-      # Right Triangle 1  (Right1)
-      # original: translation 0 -0.1 0.425
-      # nudged slightly in -y
-      # ===============================
+      # Right Triangle 1 (Right1)
       Transform {
         translation 0.005 -0.090 0.43
+        rotation 0 0.7071067811865475 0.7071067811865475 0
         children [
-          Solid {
+          TangramRightPiece {
+            color 0 1 0
             name "Right1"
-            rotation 0 0.7071067811865475 0.7071067811865475 0
-            children [
-              Shape {
-                appearance PBRAppearance {
-                  baseColor 0 1 0
-                  roughness 0.4
-                  metalness 0
-                }
-                geometry DEF GEOMETRY_RT IndexedFaceSet {
-                  coord Coordinate {
-                    point [
-                      0   0.2  0
-                      0.2 0    0
-                      0.2 0.2  0
-                      0   0.2  0.02
-                      0.2 0    0.02
-                      0.2 0.2  0.02
-                    ]
-                  }
-                  coordIndex [
-                    0 2 1 -1
-                    3 4 5 -1
-                    0 1 4 3 -1
-                    1 2 5 4 -1
-                    2 0 3 5 -1
-                  ]
-                }
-              }
-            ]
-            # Small box centered inside the right triangle
-            boundingObject Transform {
-              translation 0.133 0.133 0
-              children [
-                Box { size 0.06 0.06 0.02 }
-              ]
-            }
-            physics Physics { density 300 }
           }
         ]
       }
 
-      # ===============================
-      # Right Triangle 2  (Right2)
-      # original: translation 0.2 0.1 0.425
-      # nudged slightly in +x and +y
-      # ===============================
+      # Right Triangle 2 (Right2)
       Transform {
         translation 0.205 0.090 0.43
+        rotation 0 0 1 -3.1331853071795863
         children [
-          Solid {
+          TangramRightPiece {
+            color 0 0 1
             name "Right2"
-            rotation 0 0 1 -3.1331853071795863
-            children [
-              Shape {
-                appearance PBRAppearance {
-                  baseColor 0 0 1
-                  roughness 0.4
-                  metalness 0
-                }
-                geometry USE GEOMETRY_RT
-              }
-            ]
-            # Same kind of inner box as Right1
-            boundingObject Transform {
-              translation 0.133 0.133 0
-              children [
-                Box { size 0.06 0.06 0.02 }
-              ]
-            }
-            physics Physics { density 300 }
           }
         ]
       }
 
-      # ===============================
-      # Square  (Square)
-      # original: translation 0 0.075 0.425
-      # nudged slightly up (+y)
-      # ===============================
+      # Square
       Transform {
         translation -0.005 0.08 0.43
+        rotation 0 0 1 -3.1331853071795863
         children [
-          Solid {
+          TangramSquarePiece {
+            color 0 1 1
             name "Square"
-            rotation 0 0 1 -3.1331853071795863
-            children [
-              Shape {
-                appearance PBRAppearance {
-                  baseColor 0 1 1
-                  roughness 0.4
-                  metalness 0
-                }
-                geometry DEF GEOMETRY_SQUARE IndexedFaceSet {
-                  coord Coordinate {
-                    point [
-                      0    0    0
-                      0.15 0    0
-                      0.15 0.15 0
-                      0    0.15 0
-                      0    0    0.02
-                      0.15 0    0.02
-                      0.15 0.15 0.02
-                      0    0.15 0.02
-                    ]
-                  }
-                  coordIndex [
-                    0 1 2 3 -1
-                    4 5 6 7 -1
-                    0 1 5 4 -1
-                    1 2 6 5 -1
-                    2 3 7 6 -1
-                    3 0 4 7 -1
-                  ]
-                }
-              }
-            ]
-            # Inner box entirely inside the square
-            boundingObject Transform {
-              translation 0.075 0.075 0
-              children [
-                Box { size 0.12 0.12 0.02 }
-              ]
-            }
-            physics Physics { density 300 }
           }
         ]
       }
 
-      # ===============================
-      # Parallelogram 1  (Para1)
-      # original: translation 0 0.075 0.425  (same as square)
-      # nudged slightly down and right to separate from square
-      # ===============================
+      # Parallelogram 1
       Transform {
         translation -0.005 0.09 0.43
         children [
-          Solid {
+          TangramPara1Piece {
+            color 1 0 1
             name "Para1"
-            children [
-              Shape {
-                appearance PBRAppearance {
-                  baseColor 1 0 1
-                  roughness 0.4
-                  metalness 0
-                }
-                geometry DEF GEOMETRY_P1 IndexedFaceSet {
-                  coord Coordinate {
-                    point [
-                      -0.15 0     0
-                      0     0     0
-                      -0.15 0.075 0
-                      -0.3  0.075 0
-                      -0.15 0     0.02
-                      0     0     0.02
-                      -0.15 0.075 0.02
-                      -0.3  0.075 0.02
-                    ]
-                  }
-                  coordIndex [
-                    0 1 2 3 -1
-                    4 5 6 7 -1
-                    0 1 5 4 -1
-                    1 2 6 5 -1
-                    2 3 7 6 -1
-                    3 0 4 7 -1
-                  ]
-                }
-              }
-            ]
-            # Box centered inside the parallelogram
-            boundingObject Transform {
-              translation -0.15 0.0375 0
-              children [
-                Box { size 0.06 0.03 0.02 }
-              ]
-            }
-            physics Physics { density 300 }
           }
         ]
       }
 
-      # ===============================
-      # Parallelogram 2  (Para2)
-      # original: translation 0 -0.075 0.425
-      # nudged slightly down (-y)
-      # ===============================
+      # Parallelogram 2
       Transform {
         translation -0.005 -0.085 0.43
         children [
-          Solid {
+          TangramPara2Piece {
+            color 1 1 0
             name "Para2"
-            children [
-              Shape {
-                appearance PBRAppearance {
-                  baseColor 1 1 0
-                  roughness 0.4
-                  metalness 0
-                }
-                geometry DEF GEOMETRY_P2 IndexedFaceSet {
-                  coord Coordinate {
-                    point [
-                      -0.3  -0.075 0
-                      -0.15 -0.075 0
-                      0     0     0
-                      -0.15 0     0
-                      -0.3  -0.075 0.02
-                      -0.15 -0.075 0.02
-                      0     0     0.02
-                      -0.15 0     0.02
-                    ]
-                  }
-                  coordIndex [
-                    0 1 2 3 -1
-                    4 5 6 7 -1
-                    0 1 5 4 -1
-                    1 2 6 5 -1
-                    2 3 7 6 -1
-                    3 0 4 7 -1
-                  ]
-                }
-              }
-            ]
-            # Same style inner box for the second parallelogram
-            boundingObject Transform {
-              translation -0.15 -0.0375 0
-              children [
-                Box { size 0.06 0.03 0.02 }
-              ]
-            }
-            physics Physics { density 300 }
           }
         ]
       }
