@@ -8,3 +8,5 @@ orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: AllBoundingObjects
 consoles: Console:All:All
+renderingDevicePerspectives: TIAGo:Astra depth;1;0.297917;0;0
+renderingDevicePerspectives: TIAGo:Astra rgb;1;0.460417;0;0
