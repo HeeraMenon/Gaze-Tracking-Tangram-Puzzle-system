@@ -3,7 +3,6 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
-EXTERNPROTO "../protos/TangramPieces.proto"
 EXTERNPROTO "../protos/TangramIsoPiece.proto"
 EXTERNPROTO "../protos/TangramPara2Piece.proto"
 EXTERNPROTO "../protos/TangramPara1Piece.proto"
@@ -21,8 +20,9 @@ WorldInfo {
   basicTimeStep 16
 }
 DEF USER_CAMERA Viewpoint {
-  orientation -0.19152084247681778 0.19785090365223643 0.9613400994554234 1.5777209723466286
-  position 0.3117167474924136 -4.874058885011198 2.8570616739165318
+  description "USER_CAMERA"
+  orientation -0.37840095397584794 0.3746370494704467 0.8464394834802111 1.7466044335152713
+  position -0.1997966806632303 -4.010474116680174 5.162148427404381
 }
 TexturedBackground {
 }
@@ -31,173 +31,127 @@ TexturedBackgroundLight {
 Floor {
 }
 Tiago {
-  hidden position_0_0 -0.03831582442853442
-  hidden position_0_1 -2.0433970567531405
-  hidden position_0_2 6.822527748310167
-  hidden position_0_3 7.658925183872481
-  hidden position_0_4 -7.0340082307768315
-  hidden position_0_5 -7.891676821625444
-  hidden position_1_0 0.08974456854693048
-  hidden translation_2 0 0 0.6897445685469304
-  hidden position_2_0 -0.6700000015945138
-  hidden position_3_0 0.07000016514436096
-  hidden translation_4 0.025099999950016518 0.19399990001653108 -0.171
-  hidden rotation_4 0 0 1 0.009000165144326694
-  hidden position_4_0 0.25997892292364816
-  hidden rotation_5 0.9833365741753286 -0.12854777417891106 0.12854824636211848 1.5876030312759
-  hidden position_5_0 -3.1600001386729253
-  hidden rotation_6 0.5808543697875028 -0.5702683312716608 -0.5808633500638497 2.104899986925325
-  hidden position_6_0 1.2699986587952492
-  hidden rotation_7 -0.9777963212213284 -0.1481807163920504 -0.14817837053893887 1.5932515867123027
-  hidden position_7_0 1.319999999383943
-  hidden rotation_8 -0.5226930447953764 -0.6734849328229436 0.5226949647576622 1.9561798591231179
-  hidden position_8_0 -0.25960964618184956
-  hidden rotation_9 -0.4777405610732005 -0.6211937911597272 -0.6211941967936185 2.250233689247371
-  hidden position_9_0 1.4100000000739066
-  hidden rotation_10 0.7059610440262356 0.05688072819194444 0.7059628793907943 3.027957948345621
-  hidden position_12_0 2.8070888393316926e-07
-  hidden position_12_1 -4.915253612496471e-07
-  hidden translation_33 -2.8070888393316926e-07 0 0
-  hidden translation_34 -4.915253612496471e-07 0 0
-  hidden rotation_35 0 0 -0.9999999999999999 0.6700000015945139
-  hidden position_35_0 0.23999977012276186
-  hidden rotation_36 0.9857702984396542 -0.11886297766911472 0.11886341427801281 1.5851314235722107
-  hidden translation_45 1.2741682486883121e-08 -2.360081330365915e-08 0.029997973778558187
-  hidden rotation_45 -0.9398126687800782 -0.24863477809972714 -0.23437767538689888 -1.6199486196910584e-11
-  hidden rotation_49 0.9996330879597041 -0.019153155890801053 0.019153226244400228 1.5711669793605012
-  hidden rotation_50 0.3970827493760161 -0.6489692581757742 0.6489716419773436 2.385617215758625
-  hidden rotation_51 0 0 -1 5.743842866049006
-  hidden position_51_0 37.966160132018175
-  hidden rotation_52 -0.9824313734674478 0.13196300332723118 0.13196348805529873 1.5885238579685719
-  hidden rotation_53 0 0 -1 4.907445430486693
-  hidden position_53_0 36.30956987168739
-  hidden rotation_54 -0.6469723118271539 -0.5391774717238458 -0.539179452236924 1.9931083089461412
-  hidden rotation_55 0 0 1 5.532362383582342
-  hidden position_55_0 44.554644708787556
-  hidden rotation_56 0.9232519549411128 -0.27166641815923237 -0.2716674160475385 4.632616940170832
-  hidden rotation_57 0 0 1 4.674693792733729
-  hidden position_57_0 41.00285472421411
-  hidden rotation_58 0.057360213434412485 0.7059412669603659 0.7059438600321927 3.2561870907558035
-  translation 0.35324005937970226 0.45417575745969435 0.09328580389894187
-  rotation 0 0 1 -1.5707953071795862
+  translation 0.182087 -0.0669936 0.0867513
+  rotation 0.010124876004156243 -0.0014640768033748204 -0.9999476703133091 1.5706293141722842
   controller "TIAGO_Controller"
   supervisor TRUE
 }
-TangramPieces {
-  origin 0.5 -0.5 0.33
-}
 Solid {
-  translation 0.5 -0.5 0.34
+  translation 0.42 -0.69 0.52
   children [
-    DEF UPPER_HALF Pose {
-      children [
-        Pose {
-          translation 0.0933766 0.127449 0
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0 0 0
-                roughness 0.7
-                metalness 0
-              }
-              geometry Box {
-                size 0.25 0.01 0.005
-              }
-            }
-          ]
-        }
-        Pose {
-          translation -0.257476 0.186688 0
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0 0 0
-                roughness 0.7
-                metalness 0
-              }
-              geometry Box {
-                size 0.23 0.01 0.005
-              }
-            }
-          ]
-        }
-        Pose {
-          translation 0.284446 0.0653034 0
-          rotation 0 0 -1 0.785395307179586
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0 0 0
-                roughness 0.7
-                metalness 0
-              }
-              geometry Box {
-                size 0.19 0.01 0.005
-              }
-            }
-          ]
-        }
-        Pose {
-          translation -0.0884878 0.157658 0
-          rotation 0 0 -1 0.48
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0 0 0
-                roughness 0.7
-                metalness 0
-              }
-              geometry Box {
-                size 0.14 0.01 0.005
-              }
-            }
-          ]
-        }
-        Pose {
-          translation -0.271235 0.129728 0
-          rotation 0 0 -1 0.48
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0 0 0
-                roughness 0.7
-                metalness 0
-              }
-              geometry Box {
-                size 0.222 0.01 0.005
-              }
-            }
-          ]
-        }
-        Pose {
-          translation -0.17495 0.0354335 0
-          rotation 0 0 -1 1.55
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0 0 0
-                roughness 0.7
-                metalness 0
-              }
-              geometry Box {
-                size 0.088 0.01 0.005
-              }
-            }
-          ]
-        }
-      ]
-    }
     Pose {
-      rotation 1 0 0 3.141592653589793
       children [
-        USE UPPER_HALF
+        DEF UPPER_HALF Pose {
+          children [
+            Pose {
+              translation 0.0933766 0.127449 0
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 0.7
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.25 0.01 0.005
+                  }
+                }
+              ]
+            }
+            Pose {
+              translation -0.257476 0.186688 0
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 0.7
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.23 0.01 0.005
+                  }
+                }
+              ]
+            }
+            Pose {
+              translation 0.284446 0.0653034 0
+              rotation 0 0 -1 0.785395307179586
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 0.7
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.19 0.01 0.005
+                  }
+                }
+              ]
+            }
+            Pose {
+              translation -0.0884878 0.157658 0
+              rotation 0 0 -1 0.48
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 0.7
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.14 0.01 0.005
+                  }
+                }
+              ]
+            }
+            Pose {
+              translation -0.271235 0.129728 0
+              rotation 0 0 -1 0.48
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 0.7
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.222 0.01 0.005
+                  }
+                }
+              ]
+            }
+            Pose {
+              translation -0.17495 0.0354335 0
+              rotation 0 0 -1 1.55
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 0.7
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.088 0.01 0.005
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        Pose {
+          rotation 1 0 0 3.141592653589793
+          children [
+            USE UPPER_HALF
+          ]
+        }
       ]
     }
   ]
   name "Puzzle outline"
 }
 Solid {
-  translation 0 0 0.34
+  translation 0 0 0.52
   children [
     DEF MARK_LINE Shape {
       appearance PBRAppearance {
@@ -209,47 +163,101 @@ Solid {
         size 0.04 2 0.005
       }
     }
-    Transform {
-      translation 0.5 0 0
-      rotation 0 0 1 1.5708
-      scale 1 0.5 1
-      children [
-        USE MARK_LINE
-      ]
-    }
   ]
   name "Table markings"
 }
-TangramIsoPiece {
-  translation -0.76 0 0.33
-}
-TangramPara2Piece {
-  name "Para2(1)"
-  translation -0.24 0 0.33
-}
-TangramPara1Piece {
-  name "Para1(1)"
-  translation -0.28 -0.75 0.33
-}
-TangramRightPiece {
-  color 0 0 1
-  name "Right(1)"
-  translation -0.83 -0.49 0.33
-}
 Table {
-  translation -0.5 0 0
-  size 0.5 1 0.8
+  translation -0.35 0 0
+  size 0.35 1 1.2
 }
 Table {
   name "Table(1)"
-  translation 0.5 -0.5 0
-  size 0.5 0.5 0.8
+  translation 0.5 -0.7 0
+  size 0.75 0.3 1.2
 }
-TangramRightPiece {
+DEF SMALL_TRIANGLE_RED TangramIsoPiece {
+  translation -0.58 0 0.52
+  scale 0.9 0.9 0.9
+}
+DEF PARALELLOGRAM_1_RED TangramPara2Piece {
+  color 1 0 0
+  name "Para2(1)"
+  translation -0.24 0 0.52
+  scale 0.9 0.9 0.9
+}
+DEF PARALELLOGRAM_2_RED TangramPara1Piece {
+  color 1 0 0
+  name "Para1(1)"
+  translation -0.15 -0.75 0.52
+  scale 0.9 0.9 0.9
+}
+DEF BIG_TRIANGLE_1_RED TangramRightPiece {
+  color 1 0 0
+  name "Right(1)"
+  translation -0.58 -0.49 0.52
+  scale 0.9 0.9 0.9
+}
+DEF BIG_TRIANGLE_2_RED TangramRightPiece {
+  color 1 0 0
   name "Right(2)"
-  translation -0.83 0.44 0.33
+  translation -0.25 -0.14 0.52
+  scale 0.9 0.9 0.9
 }
-TangramSquarePiece {
+DEF SQUARE_RED TangramSquarePiece {
+  color 1 0 0
   name "Square(1)"
-  translation -0.52 0.3 0.33
+  translation -0.52 0.09 0.52
+  scale 0.9 0.9 0.9
+}
+DEF SMALL_TRIANGLE_BLUE TangramIsoPiece {
+  color 0 0 1
+  translation -0.35 0.15 0.52
+  scale 0.9 0.9 0.9
+}
+DEF PARALELLOGRAM_1_BLUE TangramPara2Piece {
+  color 0 0 1
+  name "Para2(1)"
+  translation -0.15 -0.21 0.52
+  scale 0.9 0.9 0.9
+}
+DEF PARALELLOGRAM_2_BLUE TangramPara1Piece {
+  color 0 0 1
+  name "Para1(1)"
+  translation -0.06 -0.43 0.52
+  scale 0.9 0.9 0.9
+}
+DEF BIG_TRIANGLE_1_BLUE TangramRightPiece {
+  color 0 0 1
+  name "Right(1)"
+  translation -0.33 -0.66 0.52
+  scale 0.9 0.9 0.9
+}
+DEF BIG_TRIANGLE_2_BLUE TangramRightPiece {
+  color 0 0 1
+  name "Right(2)"
+  translation -0.24 0.07 0.52
+  scale 0.9 0.9 0.9
+}
+DEF SQUARE_BLUE TangramSquarePiece {
+  color 0 0 1
+  name "Square(1)"
+  translation -0.28 0.3 0.52
+  scale 0.9 0.9 0.9
+}
+Solid {
+  translation 0.2 -0.16 0.52
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 1 0
+        transparency 0.6
+        roughness 0.7
+        metalness 0
+      }
+      geometry Cylinder {
+        height 0.01
+        radius 0.87
+      }
+    }
+  ]
 }

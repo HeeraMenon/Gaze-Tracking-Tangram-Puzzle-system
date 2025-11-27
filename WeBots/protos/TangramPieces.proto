@@ -9,9 +9,11 @@ EXTERNPROTO "TangramPara2Piece.proto"
 
 PROTO TangramPieces [
   field SFVec3f origin 0 0 0
+
 ] {
   Transform {
     translation IS origin
+
     children [
 
       # Isosceles Triangle (Iso)
@@ -22,6 +24,7 @@ PROTO TangramPieces [
           TangramIsoPiece {
             color 1 0 0
             name "IsoPiece"
+            scale 0.9 0.9 0.9
           }
         ]
       }
@@ -34,6 +37,7 @@ PROTO TangramPieces [
           TangramRightPiece {
             color 0 1 0
             name "Right1"
+            scale 0.9 0.9 0.9
           }
         ]
       }
@@ -46,6 +50,7 @@ PROTO TangramPieces [
           TangramRightPiece {
             color 0 0 1
             name "Right2"
+            scale 0.9 0.9 0.9
           }
         ]
       }
@@ -58,6 +63,7 @@ PROTO TangramPieces [
           TangramSquarePiece {
             color 0 1 1
             name "Square"
+            scale 0.9 0.9 0.9
           }
         ]
       }
@@ -69,6 +75,7 @@ PROTO TangramPieces [
           TangramPara1Piece {
             color 1 0 1
             name "Para1"
+            scale 0.9 0.9 0.9
           }
         ]
       }
@@ -80,6 +87,7 @@ PROTO TangramPieces [
           TangramPara2Piece {
             color 1 1 0
             name "Para2"
+            scale 0.9 0.9 0.9
           }
         ]
       }

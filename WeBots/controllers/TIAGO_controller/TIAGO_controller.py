@@ -7,7 +7,12 @@ MOTOR_LEFT = 10
 MOTOR_RIGHT = 11
 N_PARTS = 12
 
+robot_view_target = None
+vp_pos_field = None
+vp_rot_field = None
 
+init_viewpoint = [0, -2.05, 2.6]
+init_rotation = [-0.37570441069953675, 0.3756483724608402, 0.8471921246378744, 1.748990849844424]
 
 
 # ---------------------------------------------------------------------
@@ -22,28 +27,26 @@ def normalize_angle(a):
     return a
 
 
-def make_head_look_at_camera(robot_parts, robot_node, viewpoint,
-                             head_pan_sensor, head_tilt_sensor):
+def make_head_look_at_target(robot_parts, robot_node, target_pos):
     # Fields on robot and viewpoint
     base_translation_field = robot_node.getField("translation")
     base_rotation_field    = robot_node.getField("rotation")
-    cam_position_field     = viewpoint.getField("position")
     
 
-    if base_translation_field is None or base_rotation_field is None or cam_position_field is None:
+    if base_translation_field is None or base_rotation_field is None or target_pos is None:
         print("Could not get translation/rotation/position fields.")
         return
-
-    # Current joint angles from sensors
-    curr_head_pan  = head_pan_sensor.getValue()
-    curr_head_tilt = head_tilt_sensor.getValue()
 
     # Robot base pose
     base_pos = base_translation_field.getSFVec3f()   # [x, y, z]
     base_rot = base_rotation_field.getSFRotation()   # [ax, ay, az, angle]
-    cam_pos  = cam_position_field.getSFVec3f()       # [x, y, z]
+          # [x, y, z]
 
-  
+    head_pos = [
+    base_pos[0],
+    base_pos[1],
+    base_pos[2] + 0.8
+]
 
     # --- Extract body yaw from axis-angle (assuming planar, axis ~ [0,0,±1]) ---
     ax, ay, az, angle = base_rot
@@ -55,9 +58,9 @@ def make_head_look_at_camera(robot_parts, robot_node, viewpoint,
 
  
     # Vector from base to camera (world frame)
-    dx = cam_pos[0] - base_pos[0]
-    dy = -cam_pos[1] - base_pos[1]
-    dz = cam_pos[2] - base_pos[2]
+    dx = target_pos[0] - head_pos[0]
+    dy = -target_pos[1] - head_pos[1]
+    dz = target_pos[2] - head_pos[2]
 
     # Guard against degenerate case 
     if dx == 0 and dy == 0:
@@ -113,8 +116,9 @@ def make_head_look_at_camera(robot_parts, robot_node, viewpoint,
 # ---------------------------------------------------------------------
 # Helper: handles keyboard input
 # ---------------------------------------------------------------------
-def check_keyboard(robot_parts, keyboard, robot_node, viewpoint, head_pan_sensor, head_tilt_sensor):
-    global last_space_down          # <-- add this line
+def check_keyboard(robot_parts, keyboard, robot_node, head_pan_sensor, head_tilt_sensor):
+    global last_space_down, robot_view_target  
+    global init_viewpoint, init_rotation, vp_pos_field, vp_rot_field        
 
     key = keyboard.getKey()
     speeds_left = 0.0
@@ -136,11 +140,19 @@ def check_keyboard(robot_parts, keyboard, robot_node, viewpoint, head_pan_sensor
         speeds_left = -MAX_SPEED
         speeds_right = MAX_SPEED
 
+    elif key == ord('0'):
+        vp_pos_field.setSFVec3f(init_viewpoint)
+        vp_rot_field.setSFRotation(init_rotation)
+        
+
     space_now = (key == ord(' '))
     if space_now and not last_space_down:
         print("SPACE pressed: making head look at camera")
         if robot_node is not None and viewpoint is not None:
-            make_head_look_at_camera(robot_parts, robot_node, viewpoint, head_pan_sensor, head_tilt_sensor)
+            viewpoint_pos_field = viewpoint.getField("position")
+            cam_pos  = viewpoint_pos_field.getSFVec3f() 
+            robot_view_target = cam_pos
+            make_head_look_at_target(robot_parts, robot_node, robot_view_target)
         else:
             print("Cannot look at camera: robot_node or viewpoint is None.")
 
@@ -201,18 +213,45 @@ if robot_node is None:
 viewpoint = robot.getFromDef("USER_CAMERA")
 if viewpoint is None:
     print("Error: could not find USER_CAMERA Viewpoint. Check the DEF name in the world file.")
+else:
+    vp_pos_field = viewpoint.getField("position")
+    vp_rot_field = viewpoint.getField("orientation")
+
+
+vp_pos_field.setSFVec3f(init_viewpoint)
+vp_rot_field.setSFRotation(init_rotation) 
 
 # Enable keyboard
 keyboard = Keyboard()
-keyboard.enable(time_step)
+keyboard.enable(time_step) 
+
 
 initial_time = robot.getTime()
 
 print("Use arrow keys to drive. Press SPACE to turn head toward the camera.")
 
+# initial view direction of robot
+right1_node = robot.getFromDef("PARA_PIECE_1_A")
+if right1_node is None:
+    print("Could not find PARA_PIECE_1_A node")
+
+piece_pos = 0
+last_robot_view_target = 0
+
+if right1_node is not None:
+    translation_field = right1_node.getField("translation")
+
+
+
 # Main loop
 while robot.step(time_step) != -1:
-    check_keyboard(robot_parts, keyboard, robot_node, viewpoint, head_pan_sensor, head_tilt_sensor)
+    # piece_pos = translation_field.getSFVec3f()  # [x, y, z]
+    # print("PARA_PIECE_1_A position:", piece_pos)
+    # robot_view_target = piece_pos
+    check_keyboard(robot_parts, keyboard, robot_node, head_pan_sensor, head_tilt_sensor)
+    # if robot_view_target and not last_robot_view_target:
+    #     make_head_look_at_target(robot_parts, robot_node, robot_view_target)
+    #     last_robot_view_target = robot_view_target
 
     # "Hello" waving movement (arm joint 8)
     t = robot.getTime() - initial_time
