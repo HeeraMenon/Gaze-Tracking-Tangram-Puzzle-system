@@ -5,6 +5,8 @@ import math
 import os
 import numpy as np
 
+
+
 # Workaround for ikpy on newer NumPy versions
 if not hasattr(np, "float"):
     np.float = float
@@ -25,6 +27,14 @@ init_rotation = [-0.37570441069953675, 0.3756483724608402, 0.8471921246378744, 1
 # ---------------------------------------------------------------------
 # Helper: current chain joint vector from Webots motors
 # ---------------------------------------------------------------------
+def distance_to_target(target_xyz):
+    pos, _ = get_end_effector_pose_from_sensors()
+    dx = pos[0] - target_xyz[0]
+    dy = pos[1] - target_xyz[1]
+    dz = pos[2] - target_xyz[2]
+    return math.sqrt(dx*dx + dy*dy + dz*dz)
+
+
 def get_current_chain_positions():
     """
     Build a list of joint positions for all links in my_chain.
@@ -49,6 +59,45 @@ def get_current_chain_positions():
 
     return current
 
+def get_end_effector_pose():
+    # 1) get current joint configuration
+    joints = get_joint_positions_from_sensors()
+
+    # 2) run forward kinematics
+    T = my_chain.forward_kinematics(joints)  # 4x4 homogeneous matrix
+
+    # 3) extract position
+    x = T[0, 3]
+    y = T[1, 3]
+    z = T[2, 3]
+
+    # 4) extract orientation (rotation matrix)
+    R = T[:3, :3]
+
+    return (x, y, z), R
+
+def get_joint_positions_from_sensors():
+    joints = [0.0] * len(my_chain.links)
+    for i, link in enumerate(my_chain.links):
+        if not my_chain.active_links_mask[i]:
+            continue
+
+        link_name = link.name
+        if link_name in arm_sensors:
+            joints[i] = arm_sensors[link_name].getValue()
+        else:
+            joints[i] = 0.0
+
+    return joints
+
+
+def get_end_effector_pose_from_sensors():
+    joints = get_joint_positions_from_sensors()
+    T = my_chain.forward_kinematics(joints)
+    pos = (T[0, 3], T[1, 3], T[2, 3])
+    R = T[:3, :3]
+    return pos, R
+
 # ---------------------------------------------------------------------
 # IKPY-based arm motion
 # ---------------------------------------------------------------------
@@ -72,7 +121,7 @@ def move_arm_to_position(target_xyz, orientation=None, orientation_mode=None,
         decide to re-run IK or log a warning.
     """
     # 1) Get current joint configuration as initial guess
-    initial_position = get_current_chain_positions()
+    initial_position = get_joint_positions_from_sensors()
 
     # 2) Run IK
     if orientation is not None and orientation_mode is not None:
@@ -117,6 +166,69 @@ def move_arm_to_position(target_xyz, orientation=None, orientation_mode=None,
             # You can log if needed:
             # print(f"Setting {link_name} to {target_angle:.3f}")
 
+    return err
+
+def move_arm_to_position_blocking(target_xyz,
+                                  orientation=None,
+                                  orientation_mode=None,
+                                  pos_tolerance=0.005,
+                                  max_steps=1000):
+    # Command the move
+    err_ik = move_arm_to_position(target_xyz, orientation, orientation_mode,
+                         error_tolerance=pos_tolerance)
+    
+    if err_ik > pos_tolerance:
+        print("[IK] Target likely unreachable, aborting blocking wait")
+        return
+
+    # Wait until you are close enough or time out
+    steps = 0
+    while robot.step(time_step) != -1:
+        err = distance_to_target(target_xyz)
+        if err < pos_tolerance:
+            # Reached the target
+            break
+        steps += 1
+        if steps > max_steps:
+            print("[IK] Warning: timeout waiting for target", target_xyz)
+            break
+
+def motor_blocking(target_angle):
+    sensor = arm_sensors["arm_4_joint"]   # not "..._sensor"
+    motor  = robot_parts[names.index("arm_4_joint")]
+
+    while robot.step(time_step) != -1:
+        curr_rotation = sensor.getValue()
+        err = abs(curr_rotation - target_angle)
+        if err < 0.01:
+            break
+    
+
+
+def sanity_test_ik():
+    # Choose some joint vector inside bounds
+    q = get_current_chain_positions()
+    print("Sanity test: q =", q)
+
+    # Forward kinematics
+    T = my_chain.forward_kinematics(q)
+    target = T[:3, 3]
+
+    # Inverse kinematics back to the same position, no orientation constraint
+    q_ik = my_chain.inverse_kinematics(target, initial_position=q)
+
+    T_ik = my_chain.forward_kinematics(q_ik)
+    pos_ik = T_ik[:3, 3]
+
+    err = math.sqrt(
+        (pos_ik[0] - target[0])**2 +
+        (pos_ik[1] - target[1])**2 +
+        (pos_ik[2] - target[2])**2
+    )
+
+    print("Target from FK:", target)
+    print("Back from IK:", pos_ik)
+    print("Position error in sanity test:", err)
 
 # ---------------------------------------------------------------------
 # Helper: make head look at the Viewpoint
@@ -247,12 +359,106 @@ def check_keyboard(robot_parts, keyboard, robot_node, head_pan_sensor, head_tilt
         vp_pos_field.setSFVec3f(init_viewpoint)
         vp_rot_field.setSFRotation(init_rotation)
 
-    elif key == ord('M'):
-        offset_target = [0.6, 0.1, 0.9] 
-        print("'m' pressed: moving arm to", offset_target)
-        move_arm_to_position(offset_target,
-                            orientation=[0, 0, 1],
-                            orientation_mode="Y")
+    elif key == ord('1'):
+        target_x = 0.1588165006012755
+        target_y = -0.6551061765994144
+        target_z = 0.43
+        target = [target_x, target_y, target_z] 
+        print("'1' pressed: moving arm to scattered pieces", target)
+
+        # current EE pose
+        pos, _ = get_end_effector_pose()
+        current_x, current_y, current_z = pos
+
+        TABLE_Z = 0.46
+        LIFT = 0.3
+        safe_z = TABLE_Z + LIFT
+
+        lifted_start = [current_x, current_y, max(current_z, safe_z)]
+        lifted_target = [target_x, target_y, max(target_z, safe_z)]
+
+        # 1) move straight up to a safe height
+        # move_arm_to_position_blocking(
+        #     lifted_start,
+        #     # orientation=[0, 0, 1],
+        #     # orientation_mode="Z",
+        #     pos_tolerance=0.2
+        # )
+
+        # move_arm_to_position_blocking(
+        #     lifted_target,
+        #     orientation=[0, 0, 1],
+        #     orientation_mode="Z",
+        #     pos_tolerance=0.2
+        # )
+
+        lift_rotation = 0.8
+        robot_parts[6].setPosition(lift_rotation)
+        motor_blocking(lift_rotation)
+
+        # # 2) move down to the target
+        # move_arm_to_position_blocking(
+        #     target,
+        #     # orientation=[0, 0, 1],
+        #     # orientation_mode="Z",
+        # )
+        move_arm_to_position_blocking(
+        target,
+        orientation=[0, 0, 1],
+        orientation_mode="Z",
+        )
+
+
+
+    elif key == ord('2'):
+        target_x = 0.7
+        target_y = 0.0
+        target_z= 0.43
+        target = [target_x, target_y, target_z] 
+        print("'2' pressed: moving arm to rocket shape", target)
+
+        pos, _ = get_end_effector_pose()
+        current_x, current_y, current_z = pos
+
+        TABLE_Z = 0.46
+        LIFT = 0.3
+        safe_z = TABLE_Z + LIFT
+
+        lifted_start = [current_x, current_y, max(current_z, safe_z)]
+        lifted_target = [target_x, target_y, max(target_z, safe_z)]
+
+        # move_arm_to_position_blocking(
+        #     lifted_start,
+        #     pos_tolerance=0.2,
+        #     # orientation=[0, 0, 1],
+        #     # orientation_mode="Z",
+        #     # orientation=[0, 0, 1],
+        # )
+
+        lift_rotation = 0.8
+        robot_parts[6].setPosition(lift_rotation)
+        motor_blocking(lift_rotation)
+
+        # move_arm_to_position_blocking(
+        # lifted_target,
+        # orientation=[0, 0, 1],
+        # orientation_mode="Z",
+        # pos_tolerance=0.2
+        # )
+
+        # move_arm_to_position_blocking(
+        #     target,
+        #     # orientation=[0, 0, 1],
+        #     # orientation_mode="Z",
+        # )
+        move_arm_to_position_blocking(
+        target,
+        orientation=[0, 0, 1],
+        orientation_mode="Z",
+        )
+
+        
+        
         
     space_now = (key == ord(' '))
     if space_now and not last_space_down:
@@ -296,11 +502,7 @@ depth = robot.getDevice("Astra depth")
 depth.enable(time_step)
 
 # Robot part names (same order as C code)
-names = [
-    "head_2_joint", "head_1_joint", "torso_lift_joint", "arm_1_joint",
-    "arm_2_joint", "arm_3_joint", "arm_4_joint", "arm_5_joint",
-    "arm_6_joint", "arm_7_joint", "wheel_left_joint", "wheel_right_joint"
-]
+
 
 base_elements = [
     "base_link",
@@ -319,9 +521,9 @@ my_chain = Chain.from_urdf_file(
     last_link_vector=last_link_vector,
 )
 
-print("IK chain links:")
-for i, link in enumerate(my_chain.links):
-    print(i, link.name, "bounds=", link.bounds)
+# print("IK chain links:")
+# for i, link in enumerate(my_chain.links):
+#     print(i, link.name, "bounds=", link.bounds)
 
 arm_joint_names = {
     "torso_lift_joint",  # disable later if unstable
@@ -346,12 +548,40 @@ for i, link in enumerate(my_chain.links):
         my_chain.active_links_mask[i] = False
 
 
-
+names = [
+    "head_2_joint", "head_1_joint", "torso_lift_joint", "arm_1_joint",
+    "arm_2_joint", "arm_3_joint", "arm_4_joint", "arm_5_joint",
+    "arm_6_joint", "arm_7_joint", "wheel_left_joint", "wheel_right_joint"
+]
 
 # Target positions for initialization
-target_pos = [0.24, -0.67, 0.09, 0.07, 0.26, -3.16, 1.27, 1.32, 0.0, 1.41, float('inf'), float('inf')]
+target_pos = [
+    0.24, #head_2_joint
+    -0.67, #head_1_joint
+    0.09, #torso_lift_joint
+    0.07, #arm_1_joint
+    1.0 , #arm_2_joint
+    0, #arm_3_joint
+    1, #arm_4_joint
+    1.5, #arm_5_joint
+    -1.39, #arm_6_joint
+    1.41, #arm_7_joint
+    float('inf'), 
+    float('inf')]
+
+arm_sensor_names = [
+    "arm_1_joint_sensor",
+    "arm_2_joint_sensor",
+    "arm_3_joint_sensor",
+    "arm_4_joint_sensor",
+    "arm_5_joint_sensor",
+    "arm_6_joint_sensor",
+    "arm_7_joint_sensor",
+    "torso_lift_joint",
+]
 
 robot_parts = []
+arm_sensors = {}
 
 # Configure motors
 for i in range(N_PARTS):
@@ -359,6 +589,13 @@ for i in range(N_PARTS):
     robot_parts.append(motor)
     motor.setVelocity(motor.getMaxVelocity() / 2.0)
     motor.setPosition(target_pos[i])
+
+    if names[i].startswith("arm_"):
+        ps = motor.getPositionSensor()
+        ps.enable(time_step)
+        arm_sensors[names[i]] = ps
+
+
 
 # Position sensors for pan/tilt
 head_pan_sensor  = robot.getDevice("head_1_joint_sensor")
@@ -405,6 +642,14 @@ last_robot_view_target = 0
 if right1_node is not None:
     translation_field = right1_node.getField("translation")
 
+# current_chain_positions = get_current_chain_positions()
+# print ("initial chain positions", current_chain_positions)
+
+# pos, R = get_end_effector_pose()
+# print("End effector position (base frame):", pos)
+# print("Rotation matrix:\n", R)
+
+
 
 
 # Main loop
@@ -417,6 +662,6 @@ while robot.step(time_step) != -1:
     #     make_head_look_at_target(robot_parts, robot_node, robot_view_target)
     #     last_robot_view_target = robot_view_target
 
-    # "Hello" waving movement (arm joint 8)
-    t = robot.getTime() - initial_time
-    robot_parts[8].setPosition(0.3 * math.sin(5.0 * t) - 0.3)
+    # # "Hello" waving movement (arm joint 8)
+    # t = robot.getTime() - initial_time
+    # robot_parts[8].setPosition(0.3 * math.sin(5.0 * t) - 0.3)
