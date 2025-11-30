@@ -176,26 +176,44 @@ def move_arm_to_position_blocking(target_xyz,
                                   orientation=None,
                                   orientation_mode=None,
                                   pos_tolerance=0.005,
-                                  max_steps=1000):
+                                  max_steps=1000,
+                                  min_z=0.52):
     # Command the move
-    err_ik = move_arm_to_position(target_xyz, orientation, orientation_mode,
-                         error_tolerance=pos_tolerance)
+    err_ik = move_arm_to_position(
+        target_xyz,
+        orientation,
+        orientation_mode,
+        error_tolerance=pos_tolerance
+    )
     
     if err_ik > pos_tolerance:
         print("[IK] Target likely unreachable, aborting blocking wait")
         return
 
-    # Wait until you are close enough or time out
     steps = 0
     while robot.step(time_step) != -1:
+        # SAFETY CHECK: make sure end-effector doesn't go below min_z
+        pos, _ = get_end_effector_pose_from_sensors()
+        current_z = pos[2]   # assuming chain frame shares z with world (usual TIAGo case)
+
+        if current_z < min_z:
+            print(f"[IK] SAFETY: end-effector z={current_z:.3f} < min_z={min_z:.3f}, aborting move.")
+            # Optionally try to move straight up to safety:
+            safe_target = [pos[0], pos[1], min_z]
+            move_arm_to_position(safe_target, orientation, orientation_mode)
+            break
+
+        # Normal convergence check
         err = distance_to_target(target_xyz)
         if err < pos_tolerance:
-            # Reached the target
+            print(f"[IK] Reached target within tolerance {pos_tolerance:.4f}")
             break
+
         steps += 1
         if steps > max_steps:
             print("[IK] Warning: timeout waiting for target", target_xyz)
             break
+
 
 def motor_blocking(target_angle):
     sensor = arm_sensors["arm_4_joint"]   # not "..._sensor"
@@ -208,37 +226,84 @@ def motor_blocking(target_angle):
             break
     
 def arm_movement(targetObject, lift, tableHeight, robotNode):
-    targetPosWC = None
-    if targetObject is not None:
-        targetPosWC = targetObject.getField("translation").getSFVec3f() 
-    else: 
-        print (targetObject, "is not valid")
-    targetPosRC = world_to_robot(targetPosWC,robotNode)
+    """
+    Move the arm to a given targetObject in three phases:
+      1) go up to a safe height (>= min_z),
+      2) move horizontally above the target at that safe height,
+      3) move down to the target height, but never below min_z.
 
+    `tableHeight` is the height of the table in WORLD coords; we enforce that
+    no commanded end-effector position ever goes below max(tableHeight, 0.52).
+    """
+    if targetObject is None:
+        print("[arm_movement] ERROR: targetObject is None")
+        return
 
-    target_x = targetPosRC[0]
-    target_y = targetPosRC[1]
-    target_z= targetPosRC[2]
+    # Safety height in world coordinates
+    MIN_Z_WORLD = max(tableHeight, 0.40)
 
-    pos, _ = get_end_effector_pose()
+    # 1) Get target position in WORLD coordinates
+    targetPosWC = list(targetObject.getField("translation").getSFVec3f())
+    # Clamp target z so we never aim below the allowed height
+    if targetPosWC[2] < MIN_Z_WORLD:
+        print(f"[arm_movement] Clamping target Z from {targetPosWC[2]:.3f} to {MIN_Z_WORLD:.3f}")
+        targetPosWC[2] = MIN_Z_WORLD
+
+    # 2) Convert clamped world coordinates to ROBOT coordinates
+    targetPosRC = world_to_robot(targetPosWC, robotNode)
+    target_x, target_y, target_z = targetPosRC
+
+    # 3) Get current end-effector pose (in the same frame as IK chain)
+    pos, _ = get_end_effector_pose_from_sensors()
     current_x, current_y, current_z = pos
-    safe_z = tableHeight + lift
 
-    lifted_target = [target_x, target_y, max(target_z, safe_z)]
+    # Safety height in robot coordinates:
+    # we assume robot z-axis is aligned with world z, so we can use the same threshold.
+    MIN_Z = MIN_Z_WORLD
 
-    lift_rotation = 0.8
-    robot_parts[6].setPosition(lift_rotation)
-    motor_blocking(lift_rotation)
+    # -----------------------------------------------
+    # Phase 0: pre-lift joint to avoid sweeping low
+    # -----------------------------------------------
+    # lift_rotation = 0.8
+    # robot_parts[names.index("arm_4_joint")].setPosition(lift_rotation)
+    # motor_blocking(lift_rotation)
+
+    # -----------------------------------------------
+    # Phase 1: go straight up from current position
+    # -----------------------------------------------
+    phase1_z = max(current_z, MIN_Z + lift)
+    phase1_target = [current_x, current_y, phase1_z]
 
     move_arm_to_position_blocking(
-        lifted_target,
+        phase1_target,
         orientation=[0, 0, 1],
-        orientation_mode="Z",
-        pos_tolerance=0.2
+        min_z=MIN_Z,
     )
 
+    # -----------------------------------------------
+    # Phase 2: move horizontally above the target
+    # -----------------------------------------------
+    phase2_z = max(target_z + lift, MIN_Z + lift)
+    phase2_target = [target_x, target_y, phase2_z]
+
     move_arm_to_position_blocking(
-    targetPosRC,
-    orientation=[0, 0, 1],
-    orientation_mode="Z",
+        phase2_target,
+        # orientation=[0, 0, 1],
+        # orientation_mode="Z",
+        pos_tolerance=0.2,
+        min_z=MIN_Z,
+    )
+
+    # -----------------------------------------------
+    # Phase 3: descend to the clamped target height
+    # -----------------------------------------------
+    final_z = max(target_z, MIN_Z)
+    phase3_target = [target_x, target_y, final_z]
+
+    move_arm_to_position_blocking(
+        phase3_target,
+        pos_tolerance=0.01,
+        min_z=MIN_Z,
+        orientation=[0, 0, 1],
+        orientation_mode="Z",
     )

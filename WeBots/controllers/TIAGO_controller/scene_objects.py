@@ -92,8 +92,8 @@ def init_scene_objects(robot: Supervisor):
         "viewpoint": "USER_CAMERA",
         # Red pieces
         "small_triangle_red": "SMALL_TRIANGLE_RED",
-        "para_1_red": "PARALELLOGRAM_2_RED",
-        "para_2_red": "PARALELLOGRAM_1_RED",
+        "para_1_red": "PARALELLOGRAM_1_RED",
+        "para_2_red": "PARALELLOGRAM_2_RED",
         "big_triangle_1_red": "BIG_TRIANGLE_1_RED",
         "big_triangle_2_red": "BIG_TRIANGLE_2_RED",
         "square_red": "SQUARE_RED",

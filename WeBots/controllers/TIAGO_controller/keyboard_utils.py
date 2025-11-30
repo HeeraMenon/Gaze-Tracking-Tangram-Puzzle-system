@@ -35,16 +35,32 @@ def check_keyboard(robot_parts, keyboard, robot_node):
         vp_rot_field.setSFRotation(cfg.init_viewpoint_rotation)
 
     elif key == ord('1'):
-        arm_movement(scene.puzzle_outline, 0.3, 0.43, robot_node)
+        print("Moving arm to puzzle outline")
+        arm_movement(scene.puzzle_outline, 0.3, 0.4, robot_node)
         
     elif key == ord('2'):
-        arm_movement(scene.square_red, 0.3, 0.43, robot_node) 
+        print("Moving arm to square blue piece")
+        arm_movement(scene.square_blue, 0.3, 0.4, robot_node) 
 
     elif key == ord('3'):
-        arm_movement(scene.para_1_red, 0.3, 0.43, robot_node)
+        print("Moving arm to para 1 blue piece")
+        arm_movement(scene.para_1_blue, 0.3, 0.4, robot_node)
     
     elif key == ord('4'):
-        arm_movement(scene.para_2_target, 0.3, 0.43, robot_node)
+        print("Moving arm to para 2 blue piece")
+        arm_movement(scene.para_2_blue, 0.3, 0.4, robot_node)
+    
+    elif key == ord('5'):
+        print("Moving arm to small triangle blue piece")
+        arm_movement(scene.small_triangle_blue, 0.3, 0.4, robot_node)
+
+    elif key == ord('6'):
+        print("Moving arm to big triangle 1 blue piece")
+        arm_movement(scene.big_triangle_1_blue, 0.3, 0.4, robot_node)
+
+    elif key == ord('7'):
+        print("Moving arm to big triangle 2 blue piece")
+        arm_movement(scene.big_triangle_2_blue, 0.3, 0.4, robot_node)
         
         
     space_now = (key == ord(' '))

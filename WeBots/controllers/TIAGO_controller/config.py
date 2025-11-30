@@ -20,7 +20,7 @@ BASE_ELEMENTS = [
 
 LAST_LINK_VECTOR = [0.004, 0.0, -0.1741]
 
-ARM_JOINT_NAMES = {
+ARM_JOINT_NAMES = [
     "torso_lift_joint",  # can be disabled later if needed
     "arm_1_joint",
     "arm_2_joint",
@@ -29,7 +29,8 @@ ARM_JOINT_NAMES = {
     "arm_5_joint",
     "arm_6_joint",
     "arm_7_joint",
-}
+]
+
 
 # Motor order and initial targets
 JOINT_NAMES = [
