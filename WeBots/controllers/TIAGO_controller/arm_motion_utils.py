@@ -173,6 +173,7 @@ def move_arm_to_position(target_xyz, orientation=None, orientation_mode=None,
     return err
 
 def move_arm_to_position_blocking(target_xyz,
+                                  target_string,
                                   orientation=None,
                                   orientation_mode=None,
                                   pos_tolerance=0.005,
@@ -187,7 +188,7 @@ def move_arm_to_position_blocking(target_xyz,
     )
     
     if err_ik > pos_tolerance:
-        print("[IK] Target likely unreachable, aborting blocking wait")
+        print("[IK] Target", target_string, " likely unreachable, aborting blocking wait")
         return
 
     steps = 0
@@ -206,13 +207,13 @@ def move_arm_to_position_blocking(target_xyz,
         # Normal convergence check
         err = distance_to_target(target_xyz)
         if err < pos_tolerance:
-            print(f"[IK] Reached target within tolerance {pos_tolerance:.4f}")
             break
 
         steps += 1
         if steps > max_steps:
             print("[IK] Warning: timeout waiting for target", target_xyz)
             break
+
 
 
 def motor_blocking(target_angle):
@@ -225,22 +226,32 @@ def motor_blocking(target_angle):
         if err < 0.01:
             break
     
-def arm_movement(targetObject, lift, tableHeight, robotNode):
+def arm_movement(targetObject, robotNode, x_offset=0.00, y_offset=0.00, 
+                 lift=0.30, tableHeight=0.40):
     """
     Move the arm to a given targetObject in three phases:
       1) go up to a safe height (>= min_z),
-      2) move horizontally above the target at that safe height,
-      3) move down to the target height, but never below min_z.
+      2) move horizontally above the target (with x/y offsets),
+      3) move down to a grasp height that accounts for tool length and piece height,
+         but never below min_z.
 
-    `tableHeight` is the height of the table in WORLD coords; we enforce that
-    no commanded end-effector position ever goes below max(tableHeight, 0.52).
+    x_offset, y_offset:
+        planar offsets in ROBOT frame that are added to the target x, y.
+    lift:
+        vertical margin (in meters) above the grasp height for the approach.
+    tableHeight:
+        table height in WORLD coordinates, used for safety.
     """
-    if targetObject is None:
-        print("[arm_movement] ERROR: targetObject is None")
-        return
 
     # Safety height in world coordinates
     MIN_Z_WORLD = max(tableHeight, 0.40)
+
+    if targetObject is None:
+        print("[arm_movement] ERROR: targetObject is None")
+        return
+    
+    name = targetObject.getDef()
+    target_label = f"piece {name}"
 
     # 1) Get target position in WORLD coordinates
     targetPosWC = list(targetObject.getField("translation").getSFVec3f())
@@ -253,20 +264,27 @@ def arm_movement(targetObject, lift, tableHeight, robotNode):
     targetPosRC = world_to_robot(targetPosWC, robotNode)
     target_x, target_y, target_z = targetPosRC
 
+    # Apply planar offsets in ROBOT frame
+    grasp_x = target_x + x_offset
+    grasp_y = target_y + y_offset
+
+    # Tool and object height compensation in z
+    GRIPPER_LENGTH = 0.05          # tune this for your TIAGo model
+    OBJECT_HALF_HEIGHT = 0.02   # tune this for your piece dimensions
+
+    # target_z is likely object center; compute surface contact height
+    grasp_z_surface = target_z + OBJECT_HALF_HEIGHT - GRIPPER_LENGTH
+
     # 3) Get current end-effector pose (in the same frame as IK chain)
     pos, _ = get_end_effector_pose_from_sensors()
     current_x, current_y, current_z = pos
 
-    # Safety height in robot coordinates:
-    # we assume robot z-axis is aligned with world z, so we can use the same threshold.
-    MIN_Z = MIN_Z_WORLD
+    # Safety height in robot coordinates (assuming z aligned)
+    table_point_world = [targetPosWC[0], targetPosWC[1], MIN_Z_WORLD]
+    table_point_robot = world_to_robot(table_point_world, robotNode)
+    _, _, table_z_robot = table_point_robot
 
-    # -----------------------------------------------
-    # Phase 0: pre-lift joint to avoid sweeping low
-    # -----------------------------------------------
-    # lift_rotation = 0.8
-    # robot_parts[names.index("arm_4_joint")].setPosition(lift_rotation)
-    # motor_blocking(lift_rotation)
+    MIN_Z = table_z_robot + OBJECT_HALF_HEIGHT
 
     # -----------------------------------------------
     # Phase 1: go straight up from current position
@@ -276,6 +294,7 @@ def arm_movement(targetObject, lift, tableHeight, robotNode):
 
     move_arm_to_position_blocking(
         phase1_target,
+        target_string=f"{target_label} - phase 1 lift", 
         orientation=[0, 0, 1],
         min_z=MIN_Z,
     )
@@ -283,25 +302,25 @@ def arm_movement(targetObject, lift, tableHeight, robotNode):
     # -----------------------------------------------
     # Phase 2: move horizontally above the target
     # -----------------------------------------------
-    phase2_z = max(target_z + lift, MIN_Z + lift)
-    phase2_target = [target_x, target_y, phase2_z]
+    phase2_z = max(grasp_z_surface + lift, MIN_Z + lift)
+    phase2_target = [grasp_x, grasp_y, phase2_z]
 
     move_arm_to_position_blocking(
         phase2_target,
-        # orientation=[0, 0, 1],
-        # orientation_mode="Z",
-        pos_tolerance=0.2,
+        target_string=f"{target_label} - above",
+        pos_tolerance=0.1,
         min_z=MIN_Z,
     )
 
     # -----------------------------------------------
-    # Phase 3: descend to the clamped target height
+    # Phase 3: descend to grasp height
     # -----------------------------------------------
-    final_z = max(target_z, MIN_Z)
-    phase3_target = [target_x, target_y, final_z]
+    final_z = max(grasp_z_surface, MIN_Z)
+    phase3_target = [grasp_x, grasp_y, final_z]
 
     move_arm_to_position_blocking(
         phase3_target,
+        target_string=f"{target_label} - grasp",
         pos_tolerance=0.01,
         min_z=MIN_Z,
         orientation=[0, 0, 1],

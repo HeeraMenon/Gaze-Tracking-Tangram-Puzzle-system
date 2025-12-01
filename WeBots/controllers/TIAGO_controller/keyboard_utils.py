@@ -3,6 +3,7 @@ from arm_motion_utils import arm_movement
 from controller import Keyboard
 import scene_objects as scene
 import config as cfg
+from demo_utils import move_arm_to_all_pieces
 
 def check_keyboard(robot_parts, keyboard, robot_node):
     global last_space_down, robot_view_target  
@@ -36,31 +37,33 @@ def check_keyboard(robot_parts, keyboard, robot_node):
 
     elif key == ord('1'):
         print("Moving arm to puzzle outline")
-        arm_movement(scene.puzzle_outline, 0.3, 0.4, robot_node)
+        arm_movement(scene.puzzle_outline, robot_node)
         
     elif key == ord('2'):
-        print("Moving arm to square blue piece")
-        arm_movement(scene.square_blue, 0.3, 0.4, robot_node) 
+        print("Moving arm to small triangle target piece")
+        arm_movement(scene.small_triangle_target, robot_node) 
 
     elif key == ord('3'):
-        print("Moving arm to para 1 blue piece")
-        arm_movement(scene.para_1_blue, 0.3, 0.4, robot_node)
+        print("Moving arm to big triangle 1 target piece")
+        arm_movement(scene.big_triangle_1_target, robot_node)
     
     elif key == ord('4'):
-        print("Moving arm to para 2 blue piece")
-        arm_movement(scene.para_2_blue, 0.3, 0.4, robot_node)
+        print("Moving arm to big triangle 2 target piece")
+        arm_movement(scene.big_triangle_2_target, robot_node)
     
     elif key == ord('5'):
-        print("Moving arm to small triangle blue piece")
-        arm_movement(scene.small_triangle_blue, 0.3, 0.4, robot_node)
+        print("Moving arm to square target piece")
+        arm_movement(scene.square_target, robot_node)
 
     elif key == ord('6'):
-        print("Moving arm to big triangle 1 blue piece")
-        arm_movement(scene.big_triangle_1_blue, 0.3, 0.4, robot_node)
+        print("Moving arm to para 1 target piece")
+        arm_movement(scene.para_1_target, robot_node)
 
     elif key == ord('7'):
-        print("Moving arm to big triangle 2 blue piece")
-        arm_movement(scene.big_triangle_2_blue, 0.3, 0.4, robot_node)
+        print("Moving arm to para 2 target piece")
+        arm_movement(scene.para_2_target, robot_node)
+    elif key == ord('9'):
+        move_arm_to_all_pieces(robot_node)
         
         
     space_now = (key == ord(' '))

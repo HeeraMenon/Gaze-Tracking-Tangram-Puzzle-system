@@ -25,12 +25,12 @@ PROTO TangramRightPiece [
             geometry IndexedFaceSet {
               coord Coordinate {
                 point [
-                -0.1   0.1   -0.01
-                0.1  -0.1   -0.01
-                0.1   0.1   -0.01
-                -0.1   0.1    0.01
-                0.1  -0.1    0.01
-                0.1   0.1    0.01
+                -0.1333333   0.0666667   -0.01
+                0.0666667  -0.1333333   -0.01
+                0.0666667   0.0666667   -0.01
+                -0.1333333   0.0666667    0.01
+                0.0666667  -0.1333333    0.01
+                0.0666667   0.0666667    0.01
                 ]
               }
               coordIndex [
@@ -45,7 +45,7 @@ PROTO TangramRightPiece [
         ]
         # Small box centered inside the triangle
         boundingObject Transform {
-          translation 0.133 0.133 0
+          translation 0 0 0
           children [
             Box { size 0.06 0.06 0.02 }
           ]

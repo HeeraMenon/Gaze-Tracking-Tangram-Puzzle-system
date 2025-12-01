@@ -48,7 +48,7 @@ PROTO TangramPara2Piece [
         ]
         # Inner box inside the parallelogram
         boundingObject Transform {
-          translation -0.15 -0.0375 0
+          translation 0 0 0
           children [
             Box { size 0.06 0.03 0.02 }
           ]

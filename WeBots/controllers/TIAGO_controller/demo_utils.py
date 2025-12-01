@@ -4,7 +4,7 @@ from arm_motion_utils import arm_movement
 import scene_objects as scene
 
 
-def _move_arm_over_group(piece_dict, x_offset, y_offset, robot_node, group_name):
+def _move_arm_over_group(piece_dict, robot_node, group_name):
     """
     Helper: loops over all nodes in piece_dict and calls arm_movement on each.
 
@@ -25,10 +25,10 @@ def _move_arm_over_group(piece_dict, x_offset, y_offset, robot_node, group_name)
             continue
 
         print(f"[arm_demo] Moving arm to {group_name} piece '{name}'")
-        arm_movement(node, x_offset, y_offset, robot_node)
+        arm_movement(node, robot_node)
 
 
-def move_arm_to_all_pieces(robot_node, x_offset=0.3, y_offset=0.40):
+def move_arm_to_all_pieces(robot_node, ):
     """
     Move the arm sequentially to:
       1. all red pieces
@@ -44,10 +44,10 @@ def move_arm_to_all_pieces(robot_node, x_offset=0.3, y_offset=0.40):
         return
 
     print("[arm_demo] Visiting all RED pieces...")
-    _move_arm_over_group(scene.red_objects, x_offset, y_offset, robot_node, "red")
+    _move_arm_over_group(scene.red_objects, robot_node, "red")
 
     print("[arm_demo] Visiting all BLUE pieces...")
-    _move_arm_over_group(scene.blue_objects, x_offset, y_offset, robot_node, "blue")
+    _move_arm_over_group(scene.blue_objects, robot_node, "blue")
 
     print("[arm_demo] Visiting all TARGET pieces...")
-    _move_arm_over_group(scene.target_objects, x_offset, y_offset, robot_node, "target")
+    _move_arm_over_group(scene.target_objects, robot_node, "target")
