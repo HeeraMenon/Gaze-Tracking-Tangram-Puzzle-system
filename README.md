@@ -1,4 +1,4 @@
-# 🚀 How to Set Up and Run the HRI Tangram Gaze‑LLM System
+# How to Set Up and Run the HRI Tangram Gaze‑LLM System
 This guide explains how to install dependencies, configure Webots, start the gaze tracking + LLM servers, and launch the robot simulation.
 
 ## 1. Create and Activate Virtual Environment
