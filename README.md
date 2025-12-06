@@ -38,6 +38,9 @@ During calibration, follow the yellow dots for 2 seconds each. <br>
 This step lets Mediapipe learn your eye geometry for accurate gaze detection. <br>
 
 ## 7. Start the Local LLM Agent
+_export OPENAI_API_KEY="......"_
+(here use your own OpenAI API key)
+
 _python llm_agent.py_ <br>
 This runs the LLM recommendation server at: <br> <br>
 
